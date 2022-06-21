@@ -1,0 +1,12 @@
+.BadgeNew__hero {
+  width: 100%;
+  padding: 1rem 0;
+  background: url('../../imagenes/cabecera.png'), #1e1e33;
+  background-repeat: repeat;
+  margin-bottom: 2rem;
+  color: #ffffff;
+  display: grid;
+  align-items: center;
+  grid-template-columns: 1fr 1fr 1fr;
+  text-align: center;
+}
