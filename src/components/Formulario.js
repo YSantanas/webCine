@@ -1,4 +1,3 @@
-// import { useState, useEffect } from 'react';
 import { useEffect } from 'react';
 import { useForm } from '../hooks/useForm';
 import {
@@ -7,18 +6,24 @@ import {
 } from '../lib/firebase';
 
 const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
-  const [values, handleChange, resetForm] = useForm({
-    titulo: '',
-    calificacion: 0,
-    portada: '',
-    descripcion: '',
-  });
+  const [values, handleChange, resetForm] = useForm(
+    {
+      titulo: '',
+      calificacion: 0,
+      portada: '',
+      descripcion: '',
+    },
+    setTempPelicula
+  );
 
   useEffect(() => {
+    // Si existe TempPelicula, se carga el formulario con los datos de la pelicula
     if (!!tempPelicula) {
       resetForm(tempPelicula);
     }
   }, [resetForm, tempPelicula]);
+
+  console.log('tempPelicula', tempPelicula);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,6 +86,7 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
             type="text"
             name="titulo"
             value={values.titulo}
+            placeholder="Nombre de la pelicula"
           ></input>
         </div>
 
@@ -105,6 +111,7 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
             type="text"
             name="portada"
             value={values.portada}
+            placeholder="Url de la portada"
           ></input>
         </div>
 
@@ -116,6 +123,7 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
             type="text"
             name="descripcion"
             value={values.descripcion}
+            placeholder="Reseña de la pelicula"
           ></input>
         </div>
 
@@ -124,6 +132,12 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
             !!tempPelicula ? 'warning' : 'primary'
           } w-100 mt-3`}
           type="submit"
+          disabled={
+            !values.titulo ||
+            !values.calificacion ||
+            !values.portada ||
+            !values.descripcion
+          }
         >
           {!!tempPelicula ? 'Actualizar' : 'Ingresar'}
         </button>
