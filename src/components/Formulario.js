@@ -1,52 +1,53 @@
-import { useState, useEffect } from "react";
-import { v4 as uuid } from "uuid";
+// import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useForm } from '../hooks/useForm';
+import {
+  actualizarPeliculaEnFirebase,
+  agregarPeliculaEnFirebase,
+} from '../lib/firebase';
 
 const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
-  const [titulo, setTitulo] = useState("");
-  const [calificacion, setCalificacion] = useState(0);
-  const [portada, setPortada] = useState("");
-  const [descripcion, setDescripcion] = useState("");
-
-  const resetForm = () => {
-    setTitulo("");
-    setCalificacion(0);
-    setPortada("");
-    setDescripcion("");
-  };
+  const [values, handleChange, resetForm] = useForm({
+    titulo: '',
+    calificacion: 0,
+    portada: '',
+    descripcion: '',
+  });
 
   useEffect(() => {
     if (!!tempPelicula) {
-      setTitulo(tempPelicula?.titulo || "");
-      setCalificacion(tempPelicula?.calificacion || 0);
-      setPortada(tempPelicula?.portada || "");
-      setDescripcion(tempPelicula?.descripcion || "");
+      resetForm(tempPelicula);
     }
-  }, [tempPelicula]);
+  }, [resetForm, tempPelicula]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nuevaPelicula = {
-      id: uuid(),
-      titulo,
-      calificacion,
-      portada,
-      descripcion,
+      titulo: values.titulo,
+      calificacion: values.calificacion,
+      portada: values.portada,
+      descripcion: values.descripcion,
     };
+    const peliculaCreadaId = await agregarPeliculaEnFirebase(nuevaPelicula);
     setPeliculas((peliculasAnteriores) => [
       ...peliculasAnteriores,
-      nuevaPelicula,
+      {
+        id: peliculaCreadaId,
+        ...nuevaPelicula,
+      },
     ]);
+
     resetForm();
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
     const peliculaActualizada = {
       id: tempPelicula?.id,
-      titulo,
-      calificacion,
-      portada,
-      descripcion,
+      titulo: values.titulo,
+      calificacion: values.calificacion,
+      portada: values.portada,
+      descripcion: values.descripcion,
     };
     setPeliculas((peliculasAnteriores) => {
       const peliculasActualizadas = peliculasAnteriores.map((pelicula) => {
@@ -57,28 +58,13 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
       });
       return peliculasActualizadas;
     });
+    await actualizarPeliculaEnFirebase(peliculaActualizada);
     setTempPelicula(null);
     resetForm();
   };
 
-  const handleTituloChange = (e) => {
-    setTitulo(e.target.value);
-  };
-
-  const handleCalificacionChange = (e) => {
-    setCalificacion(e.target.value);
-  };
-
-  const handlePortadaChange = (e) => {
-    setPortada(e.target.value);
-  };
-
-  const handleDescripcionChange = (e) => {
-    setDescripcion(e.target.value);
-  };
-
   return (
-    <div>
+    <div className="sticky-top pt-3">
       <h1 className="text-center">Añadir Peliculas</h1>
 
       <form
@@ -90,56 +76,56 @@ const Formulario = ({ setPeliculas, tempPelicula, setTempPelicula }) => {
         <div className="form-group">
           <label htmlFor="">Titulo</label>
           <input
-            onChange={handleTituloChange}
+            onChange={handleChange}
             className="form-control"
             type="text"
-            name="Titulo"
-            value={titulo}
+            name="titulo"
+            value={values.titulo}
           ></input>
         </div>
 
         <div className="form-group">
           <label htmlFor="">Calificacion</label>
           <input
-            onChange={handleCalificacionChange}
+            onChange={handleChange}
             className="form-control"
             type="number"
-            name="Calificacion"
+            name="calificacion"
             min="0"
             max="5"
-            value={calificacion}
+            value={values.calificacion}
           ></input>
         </div>
 
         <div className="form-group">
           <label htmlFor="">Portada</label>
           <input
-            onChange={handlePortadaChange}
+            onChange={handleChange}
             className="form-control"
             type="text"
-            name="Portada"
-            value={portada}
+            name="portada"
+            value={values.portada}
           ></input>
         </div>
 
         <div className="form-group">
           <label htmlFor="">Descripcion</label>
           <input
-            onChange={handleDescripcionChange}
+            onChange={handleChange}
             className="form-control"
             type="text"
-            name="Descripcion"
-            value={descripcion}
+            name="descripcion"
+            value={values.descripcion}
           ></input>
         </div>
 
         <button
           className={`btn btn-${
-            !!tempPelicula ? "warning" : "primary"
+            !!tempPelicula ? 'warning' : 'primary'
           } w-100 mt-3`}
           type="submit"
         >
-          {!!tempPelicula ? "Actualizar" : "Ingresar"}
+          {!!tempPelicula ? 'Actualizar' : 'Ingresar'}
         </button>
       </form>
     </div>

@@ -1,11 +1,12 @@
-import React from "react";
-import { MdStarOutline, MdStar } from "react-icons/md";
+import React from 'react';
+import { MdStarOutline, MdStar } from 'react-icons/md';
 
 //importamos la carpeta de los logos
-import cLogo2 from "../imagenes/logo2.png";
+import cLogo2 from '../imagenes/logo2.png';
+import { eliminarPeliculaEnFirebase } from '../lib/firebase';
 
 //Importamos estilos
-import "./styles/Badge.css";
+import './styles/Badge.css';
 
 const Stars = ({ calificacion = 0 }) => {
   const estrellasLLenas = parseInt(calificacion);
@@ -23,23 +24,25 @@ const Stars = ({ calificacion = 0 }) => {
   );
 };
 
-const Badge = ({
-  id = "",
-  titulo = "",
+export const Card = ({
+  id = '',
+  titulo = '',
   calificacion = 0,
   portada = null,
-  descripcion = "",
+  descripcion = '',
   setPeliculas,
   peliculas,
   setTempPelicula,
 }) => {
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setPeliculas((peliculasAnteriores) => {
       const peliculasFiltradas = peliculasAnteriores.filter(
         (pelicula) => pelicula.id !== id
       );
       return peliculasFiltradas;
     });
+
+    await eliminarPeliculaEnFirebase(id);
   };
 
   const handleEdit = () => {
@@ -76,5 +79,3 @@ const Badge = ({
     </div>
   );
 };
-
-export default Badge;
